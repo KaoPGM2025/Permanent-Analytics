@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Savings Tracker v2.3.0</title>
+    <title>Savings Tracker v2.3.0 (Offline)</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
@@ -104,13 +104,13 @@
 <body>
 
     <div id="app" class="max-w-md mx-auto min-h-screen p-4">
-        <div id="toast">บันทึกเงินออมถาวรเรียบร้อย! ✨</div>
+        <div id="toast">บันทึกเงินออมเรียบร้อย! ✨</div>
 
         <!-- Header -->
         <header class="flex justify-between items-center mb-6 pt-4 px-2">
             <div>
                 <h1 class="text-2xl font-bold text-slate-800">เป๋าตังค์ออม</h1>
-                <p class="text-[10px] font-bold text-blue-500 uppercase tracking-[0.2em]">Permanent Analytics v2.3.0</p>
+                <p class="text-[10px] font-bold text-blue-500 uppercase tracking-[0.2em]">Personal Web App v2.3.0</p>
             </div>
             <div class="bg-blue-50 p-3 rounded-2xl text-blue-600 border border-blue-100 shadow-sm">
                 <i class="fa-solid fa-vault text-xl"></i>
@@ -119,12 +119,12 @@
 
         <!-- Section: Home (ออมเงิน) -->
         <section id="home-section" class="space-y-4">
-            <!-- ยอดรวมทั้งหมด (ถาวร) -->
+            <!-- ยอดรวมทั้งหมด (ถาวรภายในเครื่อง) -->
             <div class="glass-card p-8 text-center relative overflow-hidden bg-white">
                 <div class="absolute top-0 right-0 p-4 opacity-5">
                     <i class="fa-solid fa-coins text-6xl"></i>
                 </div>
-                <p class="text-slate-500 text-sm mb-2 font-medium">ยอดออมสะสมถาวรทั้งหมด</p>
+                <p class="text-slate-500 text-sm mb-2 font-medium">ยอดออมสะสมทั้งหมด</p>
                 <h2 id="total-savings" class="text-4xl font-bold text-slate-900 mb-1 tracking-tight">0.00</h2>
                 <div class="inline-block px-3 py-1 bg-green-50 text-green-600 rounded-full text-[10px] font-bold uppercase tracking-wider">บาท (THB)</div>
             </div>
@@ -167,17 +167,17 @@
                     ประวัติล่าสุด (ลบอัตโนมัติ)
                 </h3>
                 <div id="history-list" class="space-y-3">
-                    <div class="text-center py-4 text-slate-400 text-xs font-medium">กำลังโหลด...</div>
+                    <div class="text-center py-4 text-slate-400 text-xs font-medium">ไม่มีรายการล่าสุด</div>
                 </div>
                 <p class="text-[9px] text-center text-slate-400 mt-4 uppercase font-bold tracking-widest">รายการจะถูกลบออกจากที่นี่ภายใน 2 นาที</p>
             </div>
         </section>
 
-        <!-- Section: Graph (สถิติถาวร) -->
+        <!-- Section: Graph (สถิติ) -->
         <section id="graph-section" class="hidden-section space-y-4">
             <div class="glass-card p-6">
-                <h3 class="font-bold text-slate-800 mb-1">สรุปการออมถาวร</h3>
-                <p class="text-[10px] text-slate-400 mb-6 font-bold uppercase">ยอดออมรายวัน (บันทึกข้อมูลตลอดไป)</p>
+                <h3 class="font-bold text-slate-800 mb-1">สรุปการออม</h3>
+                <p class="text-[10px] text-slate-400 mb-6 font-bold uppercase">ยอดออมรายวัน (เก็บข้อมูลในเครื่อง)</p>
                 <div class="h-[250px] w-full">
                     <canvas id="permanentChart"></canvas>
                 </div>
@@ -205,7 +205,7 @@
                         <span id="stat-count" class="font-bold text-slate-800">0 ครั้ง</span>
                     </div>
                     <p class="text-[10px] text-slate-400 leading-relaxed italic">
-                        * ข้อมูลในหน้านี้จะถูกเก็บรักษาไว้ถาวร แม้ว่าประวัติรายการย่อยในหน้าแรกจะถูกลบออกไปแล้วก็ตาม
+                        * ข้อมูลสรุปและยอดรวมจะถูกบันทึกไว้ในเบราว์เซอร์นี้ แม้จะปิดแอปไปแล้วข้อมูลก็ยังอยู่
                     </p>
                 </div>
             </div>
@@ -229,17 +229,12 @@
             
             <div class="glass-card p-6 bg-slate-900 text-white border-none relative overflow-hidden">
                 <div class="absolute -right-4 -bottom-4 opacity-10">
-                    <i class="fa-solid fa-shield-halved text-8xl"></i>
+                    <i class="fa-solid fa-microchip text-8xl"></i>
                 </div>
-                <h3 class="font-bold mb-2">Security & Privacy</h3>
+                <h3 class="font-bold mb-2">Local Storage Mode</h3>
                 <p class="text-[11px] opacity-70 leading-relaxed">
-                    ข้อมูลของคุณถูกแยกเป็นสองส่วนเพื่อความปลอดภัยและความเป็นส่วนตัว รายการย่อยจะถูกทำลายทิ้งทุก 2 นาที ในขณะที่ยอดสรุปจะถูกเก็บไว้ในที่ปลอดภัย
+                    แอปพลิเคชันทำงานแบบ Offline 100% ข้อมูลทั้งหมดถูกบันทึกไว้ภายในเครื่องของคุณ ไม่มีการส่งข้อมูลไปยังเซิร์ฟเวอร์ภายนอก
                 </p>
-            </div>
-
-            <div class="glass-card p-6">
-                <p class="text-[10px] text-slate-400 mb-1 font-bold uppercase tracking-widest">User Reference ID</p>
-                <p id="user-display-id" class="text-[10px] font-mono break-all text-slate-400">Loading...</p>
             </div>
         </section>
 
@@ -260,182 +255,104 @@
         </nav>
     </div>
 
-    <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
-        import { getAuth, signInAnonymously, onAuthStateChanged, signInWithCustomToken } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-        import { getFirestore, collection, addDoc, query, onSnapshot, orderBy, doc, getDoc, setDoc, updateDoc, increment, deleteDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
-
-        // --- Firebase Config ---
-        const firebaseConfig = JSON.parse(__firebase_config);
-        const app = initializeApp(firebaseConfig);
-        const auth = getAuth(app);
-        const db = getFirestore(app);
-        const appId = typeof __app_id !== 'undefined' ? __app_id : 'savings-master-v23';
-
-        let currentUser = null;
-        let savingsHistory = [];
+    <script>
+        // --- State Management (LocalStorage) ---
+        let savingsHistory = []; 
         let totalBalance = 0;
         let totalCount = 0;
         let monthlyGoal = 5000;
-        let myChart = null;
         let dailyStats = {};
+        let myChart = null;
         const EXPIRY_TIME = 2 * 60 * 1000; // 2 นาที
 
-        // --- Authentication ---
-        const initAuth = async () => {
-            try {
-                if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
-                    await signInWithCustomToken(auth, __initial_auth_token);
-                } else {
-                    await signInAnonymously(auth);
-                }
-            } catch (err) { console.error("Auth Error:", err); }
-        };
-
-        onAuthStateChanged(auth, (user) => {
-            if (user) {
-                currentUser = user;
-                document.getElementById('user-display-id').innerText = user.uid;
-                
-                // เริ่มฟังข้อมูล
-                loadSettings();
-                listenToBalance();
-                listenToHistory();
-                listenToDailyStats();
-                
-                // เริ่มระบบลบอัตโนมัติ
-                startAutoDelete();
-                startCountdownUpdate();
-            } else {
-                initAuth();
+        // Load Initial Data from LocalStorage
+        function initApp() {
+            const savedData = localStorage.getItem('savings_app_data');
+            if (savedData) {
+                const parsed = JSON.parse(savedData);
+                totalBalance = parsed.totalBalance || 0;
+                totalCount = parsed.totalCount || 0;
+                monthlyGoal = parsed.monthlyGoal || 5000;
+                dailyStats = parsed.dailyStats || {};
             }
-        });
-
-        // --- Data Listeners (Real-time) ---
-        async function loadSettings() {
-            const goalDoc = await getDoc(doc(db, 'artifacts', appId, 'users', currentUser.uid, 'settings', 'goal'));
-            if (goalDoc.exists()) {
-                monthlyGoal = goalDoc.data().value;
-                document.getElementById('goal-input').value = monthlyGoal;
-                document.getElementById('target-goal-display').innerText = `เป้าหมาย: ${monthlyGoal.toLocaleString()} ฿`;
-            }
+            
+            updateBalanceUI();
+            updateHistoryUI();
+            
+            // Start Timers
+            setInterval(checkExpiry, 5000);
+            setInterval(updateCountdownUI, 1000);
         }
 
-        function listenToBalance() {
-            const balanceRef = doc(db, 'artifacts', appId, 'users', currentUser.uid, 'summary', 'balance');
-            onSnapshot(balanceRef, (snap) => {
-                if (snap.exists()) {
-                    totalBalance = snap.data().total || 0;
-                    totalCount = snap.data().count || 0;
-                } else {
-                    totalBalance = 0;
-                    totalCount = 0;
-                }
-                updateBalanceUI();
-            }, (err) => console.error("Balance listen error:", err));
-        }
-
-        function listenToHistory() {
-            const q = query(
-                collection(db, 'artifacts', appId, 'users', currentUser.uid, 'savings'),
-                orderBy('timestamp', 'desc')
-            );
-            onSnapshot(q, (snap) => {
-                savingsHistory = snap.docs.map(d => ({ id: d.id, ...d.data() }));
-                updateHistoryUI();
-            }, (err) => console.error("History listen error:", err));
-        }
-
-        function listenToDailyStats() {
-            const q = query(
-                collection(db, 'artifacts', appId, 'users', currentUser.uid, 'daily_stats'),
-                orderBy('date', 'asc')
-            );
-            onSnapshot(q, (snap) => {
-                dailyStats = {};
-                snap.docs.forEach(d => {
-                    dailyStats[d.data().date] = d.data().amount;
-                });
-                if (document.getElementById('graph-section').style.display !== 'none') {
-                    renderPermanentChart();
-                }
-            }, (err) => console.error("Daily stats error:", err));
+        function saveData() {
+            const data = {
+                totalBalance,
+                totalCount,
+                monthlyGoal,
+                dailyStats
+            };
+            localStorage.setItem('savings_app_data', JSON.stringify(data));
         }
 
         // --- Core Functions ---
-        window.handleSaveMoney = async () => {
+        window.handleSaveMoney = () => {
             const input = document.getElementById('save-amount');
             const amount = parseFloat(input.value);
-            if (!amount || amount <= 0 || !currentUser) return;
+            if (!amount || amount <= 0) return;
 
-            const now = new Date();
-            const dateStr = now.toISOString().split('T')[0];
+            const now = Date.now();
+            const dateStr = new Date().toISOString().split('T')[0];
 
-            try {
-                // 1. บันทึกประวัติชั่วคราว
-                await addDoc(collection(db, 'artifacts', appId, 'users', currentUser.uid, 'savings'), {
-                    amount,
-                    timestamp: Date.now()
-                });
+            const newItem = {
+                id: now,
+                amount: amount,
+                timestamp: now
+            };
+            savingsHistory.unshift(newItem);
 
-                // 2. อัปเดตยอดรวมถาวร
-                const balanceRef = doc(db, 'artifacts', appId, 'users', currentUser.uid, 'summary', 'balance');
-                const bSnap = await getDoc(balanceRef);
-                if (!bSnap.exists()) {
-                    await setDoc(balanceRef, { total: amount, count: 1 });
-                } else {
-                    await updateDoc(balanceRef, { total: increment(amount), count: increment(1) });
-                }
+            totalBalance += amount;
+            totalCount += 1;
+            dailyStats[dateStr] = (dailyStats[dateStr] || 0) + amount;
 
-                // 3. อัปเดตสถิติรายวันถาวร
-                const dailyRef = doc(db, 'artifacts', appId, 'users', currentUser.uid, 'daily_stats', dateStr);
-                const dSnap = await getDoc(dailyRef);
-                if (!dSnap.exists()) {
-                    await setDoc(dailyRef, { date: dateStr, amount: amount });
-                } else {
-                    await updateDoc(dailyRef, { amount: increment(amount) });
-                }
-
-                input.value = '';
-                showToast();
-            } catch (err) { console.error("Save Error:", err); }
+            saveData();
+            updateBalanceUI();
+            updateHistoryUI();
+            
+            input.value = '';
+            showToast("บันทึกเงินออมเรียบร้อย! ✨");
         };
 
-        function startAutoDelete() {
-            setInterval(async () => {
-                if (!currentUser || savingsHistory.length === 0) return;
-                const now = Date.now();
-                const expiredItems = savingsHistory.filter(i => (now - i.timestamp) > EXPIRY_TIME);
-                
-                for (const item of expiredItems) {
-                    try {
-                        await deleteDoc(doc(db, 'artifacts', appId, 'users', currentUser.uid, 'savings', item.id));
-                    } catch (err) { console.error("Delete Error:", err); }
-                }
-            }, 5000);
+        function checkExpiry() {
+            const now = Date.now();
+            const originalLength = savingsHistory.length;
+            savingsHistory = savingsHistory.filter(item => (now - item.timestamp) < EXPIRY_TIME);
+            
+            if (savingsHistory.length !== originalLength) {
+                updateHistoryUI();
+            }
         }
 
-        function startCountdownUpdate() {
-            setInterval(() => {
-                const now = Date.now();
-                savingsHistory.forEach(item => {
-                    const el = document.getElementById(`timer-${item.id}`);
-                    if (el) {
-                        const remaining = Math.max(0, EXPIRY_TIME - (now - item.timestamp));
-                        const m = Math.floor(remaining / 60000);
-                        const s = Math.floor((remaining % 60000) / 1000);
-                        el.innerText = `หายไปใน ${m}:${s.toString().padStart(2, '0')}`;
-                        if (remaining < 10000) el.classList.add('text-red-500');
-                    }
-                });
-            }, 1000);
+        function updateCountdownUI() {
+            const now = Date.now();
+            savingsHistory.forEach(item => {
+                const el = document.getElementById(`timer-${item.id}`);
+                if (el) {
+                    const remaining = Math.max(0, EXPIRY_TIME - (now - item.timestamp));
+                    const m = Math.floor(remaining / 60000);
+                    const s = Math.floor((remaining % 60000) / 1000);
+                    el.innerText = `หายไปใน ${m}:${s.toString().padStart(2, '0')}`;
+                    if (remaining < 10000) el.classList.add('text-red-500');
+                }
+            });
         }
 
         // --- UI Logic ---
         function updateBalanceUI() {
             document.getElementById('total-savings').innerText = totalBalance.toLocaleString('th-TH', { minimumFractionDigits: 2 });
             document.getElementById('current-month-total').innerText = `ยอดออม: ${totalBalance.toLocaleString()} ฿`;
-            
+            document.getElementById('target-goal-display').innerText = `เป้าหมาย: ${monthlyGoal.toLocaleString()} ฿`;
+            document.getElementById('goal-input').value = monthlyGoal;
+
             const p = Math.min(Math.round((totalBalance / monthlyGoal) * 100), 100);
             document.getElementById('goal-percent').innerText = `${p}%`;
             document.getElementById('goal-progress').style.width = `${p}%`;
@@ -452,14 +369,14 @@
                 list.innerHTML = `<div class="text-center py-8 text-slate-300 text-xs font-bold uppercase tracking-widest">ไม่มีรายการล่าสุด</div>`;
             } else {
                 list.innerHTML = savingsHistory.map(item => `
-                    <div class="flex justify-between items-center p-4 bg-slate-50 rounded-2xl border border-white shadow-sm transition-all">
+                    <div class="flex justify-between items-center p-4 bg-slate-50 rounded-2xl border border-white shadow-sm">
                         <div class="flex items-center space-x-4">
                             <div class="w-10 h-10 bg-white rounded-xl flex items-center justify-center text-blue-500 shadow-sm">
                                 <i class="fa-solid fa-plus-circle"></i>
                             </div>
                             <div>
                                 <p class="text-base font-bold text-slate-800">${Number(item.amount).toLocaleString()} ฿</p>
-                                <p id="timer-${item.id}" class="text-[9px] text-blue-400 font-black uppercase tracking-tighter">กำลังเริ่มนับ...</p>
+                                <p id="timer-${item.id}" class="text-[9px] text-blue-400 font-black uppercase tracking-tighter">หายไปใน 2:00</p>
                             </div>
                         </div>
                         <div class="text-[10px] text-slate-300 font-bold">
@@ -524,24 +441,23 @@
             window.handleSaveMoney();
         };
 
-        window.updateGoal = async () => {
+        window.updateGoal = () => {
             const val = parseInt(document.getElementById('goal-input').value);
             if (!val || val <= 0) return;
             monthlyGoal = val;
-            await setDoc(doc(db, 'artifacts', appId, 'users', currentUser.uid, 'settings', 'goal'), { value: val });
-            document.getElementById('target-goal-display').innerText = `เป้าหมาย: ${val.toLocaleString()} ฿`;
+            saveData();
             updateBalanceUI();
-            showToast();
+            showToast("ตั้งค่าเป้าหมายใหม่แล้ว!");
         };
 
-        function showToast() {
+        function showToast(msg) {
             const t = document.getElementById("toast");
+            t.innerText = msg;
             t.className = "show";
             setTimeout(() => { t.className = ""; }, 3000);
         }
 
-        // Initialize
-        initAuth();
+        window.onload = initApp;
     </script>
 </body>
 </html>
