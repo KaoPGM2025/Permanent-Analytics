@@ -164,12 +164,12 @@
             <div class="glass-card p-6">
                 <h3 class="font-bold text-slate-800 mb-4 flex items-center">
                     <i class="fa-solid fa-history mr-2 text-blue-500"></i>
-                    ประวัติล่าสุด (ลบอัตโนมัติ)
+                    ประวัติล่าสุด (นับถอยหลังต่อเนื่อง)
                 </h3>
                 <div id="history-list" class="space-y-3">
                     <div class="text-center py-4 text-slate-400 text-xs font-medium">ไม่มีรายการล่าสุด</div>
                 </div>
-                <p class="text-[9px] text-center text-slate-400 mt-4 uppercase font-bold tracking-widest">รายการจะถูกลบออกจากที่นี่ภายใน 2 นาที</p>
+                <p class="text-[9px] text-center text-slate-400 mt-4 uppercase font-bold tracking-widest">รายการจะหายไปแม้คุณจะรีเฟรชหน้าจอ</p>
             </div>
         </section>
 
@@ -274,13 +274,17 @@
                 totalCount = parsed.totalCount || 0;
                 monthlyGoal = parsed.monthlyGoal || 5000;
                 dailyStats = parsed.dailyStats || {};
+                
+                // โหลดประวัติล่าสุดและกรองรายการที่หมดอายุออกทันที
+                const now = Date.now();
+                savingsHistory = (parsed.savingsHistory || []).filter(item => (now - item.timestamp) < EXPIRY_TIME);
             }
             
             updateBalanceUI();
             updateHistoryUI();
             
             // Start Timers
-            setInterval(checkExpiry, 5000);
+            setInterval(checkExpiry, 2000); // เช็คถ่อยถี่ขึ้นเล็กน้อย
             setInterval(updateCountdownUI, 1000);
         }
 
@@ -289,7 +293,8 @@
                 totalBalance,
                 totalCount,
                 monthlyGoal,
-                dailyStats
+                dailyStats,
+                savingsHistory // เพิ่มการบันทึกประวัติลง LocalStorage
             };
             localStorage.setItem('savings_app_data', JSON.stringify(data));
         }
@@ -328,6 +333,7 @@
             savingsHistory = savingsHistory.filter(item => (now - item.timestamp) < EXPIRY_TIME);
             
             if (savingsHistory.length !== originalLength) {
+                saveData(); // บันทึกสถานะใหม่หลังมีการลบรายการหมดอายุ
                 updateHistoryUI();
             }
         }
@@ -341,7 +347,7 @@
                     const m = Math.floor(remaining / 60000);
                     const s = Math.floor((remaining % 60000) / 1000);
                     el.innerText = `หายไปใน ${m}:${s.toString().padStart(2, '0')}`;
-                    if (remaining < 10000) el.classList.add('text-red-500');
+                    if (remaining < 15000) el.classList.add('text-red-500');
                 }
             });
         }
@@ -368,7 +374,14 @@
             if (savingsHistory.length === 0) {
                 list.innerHTML = `<div class="text-center py-8 text-slate-300 text-xs font-bold uppercase tracking-widest">ไม่มีรายการล่าสุด</div>`;
             } else {
-                list.innerHTML = savingsHistory.map(item => `
+                list.innerHTML = savingsHistory.map(item => {
+                    const now = Date.now();
+                    const remaining = Math.max(0, EXPIRY_TIME - (now - item.timestamp));
+                    const m = Math.floor(remaining / 60000);
+                    const s = Math.floor((remaining % 60000) / 1000);
+                    const isClosing = remaining < 15000;
+
+                    return `
                     <div class="flex justify-between items-center p-4 bg-slate-50 rounded-2xl border border-white shadow-sm">
                         <div class="flex items-center space-x-4">
                             <div class="w-10 h-10 bg-white rounded-xl flex items-center justify-center text-blue-500 shadow-sm">
@@ -376,14 +389,14 @@
                             </div>
                             <div>
                                 <p class="text-base font-bold text-slate-800">${Number(item.amount).toLocaleString()} ฿</p>
-                                <p id="timer-${item.id}" class="text-[9px] text-blue-400 font-black uppercase tracking-tighter">หายไปใน 2:00</p>
+                                <p id="timer-${item.id}" class="text-[9px] ${isClosing ? 'text-red-500' : 'text-blue-400'} font-black uppercase tracking-tighter">หายไปใน ${m}:${s.toString().padStart(2, '0')}</p>
                             </div>
                         </div>
                         <div class="text-[10px] text-slate-300 font-bold">
                             ${new Date(item.timestamp).toLocaleTimeString('th-TH', {hour:'2-digit', minute:'2-digit'})}
                         </div>
                     </div>
-                `).join('');
+                `}).join('');
             }
         }
 
