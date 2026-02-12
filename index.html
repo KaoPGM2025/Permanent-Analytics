@@ -3,24 +3,17 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Savings Tracker v2.5.0 (Security Lockout)</title>
+    <title>Savings Tracker (Data Restored)</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;500;600&display=swap');
         
-        :root {
-            --primary: #3b82f6;
-            --danger: #ef4444;
-            --success: #10b981;
-        }
-
         body {
             font-family: 'Kanit', sans-serif;
             background-color: #f8fafc;
             padding-bottom: 120px;
-            overflow: hidden;
             user-select: none;
         }
 
@@ -30,58 +23,11 @@
             border-radius: 32px;
             border: 1px solid rgba(255, 255, 255, 0.5);
             box-shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.04);
-            transition: all 0.3s ease;
         }
 
-        .nav-item {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            color: #94a3b8;
-            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-        }
+        .nav-item { color: #94a3b8; transition: all 0.3s ease; }
+        .nav-item.active { color: #3b82f6; transform: translateY(-4px); }
 
-        .nav-item.active {
-            color: var(--primary);
-            transform: translateY(-8px);
-        }
-
-        .streak-badge {
-            background: linear-gradient(135deg, #f59e0b 0%, #ea580c 100%);
-            box-shadow: 0 8px 15px -3px rgba(234, 88, 12, 0.3);
-        }
-
-        .forecast-card {
-            background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
-            color: white;
-        }
-
-        .progress-fill {
-            transition: width 1.5s cubic-bezier(0.34, 1.56, 0.64, 1);
-        }
-
-        #toast {
-            visibility: hidden;
-            min-width: 280px;
-            left: 50%;
-            transform: translateX(-50%);
-            bottom: 130px;
-            z-index: 200;
-        }
-
-        #toast.show {
-            visibility: visible;
-            animation: slideUp 0.4s forwards, slideDown 0.4s 2.6s forwards;
-        }
-
-        @keyframes slideUp { from { bottom: 100px; opacity: 0; } to { bottom: 130px; opacity: 1; } }
-        @keyframes slideDown { from { bottom: 130px; opacity: 1; } to { bottom: 100px; opacity: 0; } }
-
-        .hidden-section { display: none; }
-        .btn-press:active { transform: scale(0.94); }
-        
-        /* PIN Overlay Styles */
         #pin-overlay {
             position: fixed;
             inset: 0;
@@ -91,15 +37,14 @@
             flex-direction: column;
             align-items: center;
             justify-content: center;
-            transition: opacity 0.5s ease;
         }
 
         .pin-dot {
-            width: 16px;
-            height: 16px;
+            width: 14px;
+            height: 14px;
             border-radius: 50%;
             border: 2px solid #cbd5e1;
-            transition: all 0.2s ease;
+            transition: all 0.2s;
         }
 
         .pin-dot.filled {
@@ -109,8 +54,8 @@
         }
 
         .keypad-btn {
-            width: 70px;
-            height: 70px;
+            width: 75px;
+            height: 75px;
             border-radius: 50%;
             background: #f1f5f9;
             display: flex;
@@ -118,61 +63,40 @@
             justify-content: center;
             font-size: 1.5rem;
             font-weight: 600;
-            color: #1e293b;
-            transition: all 0.1s ease;
         }
 
-        .keypad-btn:active:not(:disabled) {
-            background: #e2e8f0;
-            transform: scale(0.9);
-        }
-
-        .keypad-btn:disabled {
-            opacity: 0.3;
-            cursor: not-allowed;
-        }
+        .keypad-btn:active:not(:disabled) { background: #e2e8f0; transform: scale(0.9); }
+        .keypad-btn:disabled { opacity: 0.2; }
         
-        #main-content {
-            opacity: 0;
-            transition: opacity 0.5s ease;
-            height: 100vh;
-            overflow-y: auto;
-        }
-
-        .shake {
-            animation: shake 0.4s cubic-bezier(.36,.07,.19,.97) both;
-        }
-
+        .hidden-section { display: none; }
+        .shake { animation: shake 0.4s; }
         @keyframes shake {
-            10%, 90% { transform: translate3d(-1px, 0, 0); }
-            20%, 80% { transform: translate3d(2px, 0, 0); }
-            30%, 50%, 70% { transform: translate3d(-4px, 0, 0); }
-            40%, 60% { transform: translate3d(4px, 0, 0); }
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-10px); }
+            75% { transform: translateX(10px); }
         }
-
-        input::-webkit-outer-spin-button, input::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
     </style>
 </head>
 <body>
 
-    <!-- PIN Screen Overlay -->
+    <!-- PIN Screen -->
     <div id="pin-overlay">
-        <div class="text-center mb-10">
-            <div id="pin-icon-box" class="w-20 h-20 bg-blue-50 text-blue-600 rounded-3xl flex items-center justify-center mx-auto mb-6 text-3xl shadow-sm transition-colors">
-                <i id="pin-icon" class="fa-solid fa-shield-halved"></i>
+        <div class="text-center mb-8">
+            <div id="pin-icon-box" class="w-20 h-20 bg-blue-50 text-blue-600 rounded-3xl flex items-center justify-center mx-auto mb-4 text-3xl">
+                <i id="pin-icon" class="fa-solid fa-lock"></i>
             </div>
-            <h2 id="pin-label" class="text-xl font-black text-slate-800 tracking-tight">กรุณาตั้งรหัส PIN 4 หลัก</h2>
-            <p id="pin-sub-label" class="text-slate-400 text-sm mt-1">เพื่อความปลอดภัยของข้อมูลคุณ</p>
+            <h2 id="pin-label" class="text-xl font-bold text-slate-800">กรุณากรอกรหัส PIN</h2>
+            <p id="pin-sub-label" class="text-slate-400 text-sm mt-1">ข้อมูลถูกเข้ารหัสเพื่อความปลอดภัย</p>
         </div>
 
-        <div id="dots-container" class="flex space-x-6 mb-12">
+        <div id="dots-container" class="flex space-x-5 mb-10">
             <div class="pin-dot" id="dot-0"></div>
             <div class="pin-dot" id="dot-1"></div>
             <div class="pin-dot" id="dot-2"></div>
             <div class="pin-dot" id="dot-3"></div>
         </div>
 
-        <div class="grid grid-cols-3 gap-6" id="keypad">
+        <div class="grid grid-cols-3 gap-5" id="keypad">
             <button class="keypad-btn" onclick="pressKey('1')">1</button>
             <button class="keypad-btn" onclick="pressKey('2')">2</button>
             <button class="keypad-btn" onclick="pressKey('3')">3</button>
@@ -189,448 +113,316 @@
     </div>
 
     <!-- Main Content -->
-    <div id="main-content">
-        <div id="app" class="max-w-md mx-auto min-h-screen p-5">
-            <!-- Header, Sections, Navigation (Same as before) -->
-            <div id="toast" class="fixed bg-slate-900 text-white px-6 py-4 rounded-[24px] shadow-2xl flex items-center space-x-3">
-                <div id="toast-icon" class="w-8 h-8 bg-blue-500 rounded-full flex items-center justify-center">
-                    <i class="fa-solid fa-check text-white text-sm"></i>
-                </div>
-                <span id="toast-msg" class="text-sm font-semibold">สำเร็จ!</span>
-            </div>
-
-            <header class="flex justify-between items-start mb-8 pt-4 px-2">
+    <div id="main-content" style="display:none; opacity:0; transition: opacity 0.5s;">
+        <div class="max-w-md mx-auto p-5">
+            <header class="flex justify-between items-center mb-8 pt-4">
                 <div>
-                    <p id="current-date" class="text-[11px] font-bold text-slate-400 uppercase tracking-[0.2em] mb-1">...</p>
-                    <h1 class="text-3xl font-black text-slate-900 leading-tight">เป๋าตังค์ออม <span class="text-blue-600">2.5</span></h1>
+                    <p id="current-date" class="text-xs font-bold text-slate-400 uppercase tracking-widest">...</p>
+                    <h1 class="text-2xl font-black text-slate-900">กระปุกออมเงิน</h1>
                 </div>
-                <div id="streak-container" class="streak-badge px-4 py-2 rounded-2xl text-white flex items-center space-x-2 border border-white/20">
-                    <i class="fa-solid fa-fire text-lg animate-pulse"></i>
-                    <span id="streak-count" class="text-xl font-black italic">0</span>
+                <div class="bg-orange-500 px-4 py-2 rounded-2xl text-white flex items-center space-x-2">
+                    <i class="fa-solid fa-fire animate-bounce"></i>
+                    <span id="streak-count" class="text-lg font-bold">0</span>
                 </div>
             </header>
 
-            <section id="home-section" class="space-y-6">
-                <div class="glass-card p-6 forecast-card relative overflow-hidden">
-                    <div class="absolute right-0 top-0 p-4 opacity-10">
-                        <i class="fa-solid fa-wand-magic-sparkles text-6xl"></i>
-                    </div>
-                    <h4 class="text-blue-400 text-[10px] font-black uppercase tracking-widest mb-3">AI SAVINGS FORECAST</h4>
-                    <div id="forecast-content">
-                        <p class="text-sm font-medium text-slate-300">ออมอีกวันละ <span id="avg-daily" class="text-white font-bold">0</span> ฿ เพื่อเป้าหมาย</p>
-                        <p class="text-xl font-black mt-1">จะถึงเป้าในอีก <span id="days-left" class="text-blue-400 font-black italic">--</span> วัน</p>
-                    </div>
-                </div>
-
-                <div class="glass-card p-8 bg-white relative overflow-hidden">
-                    <p class="text-slate-400 text-xs font-bold uppercase tracking-widest mb-2">ยอดเงินคงเหลือสะสม</p>
+            <!-- Home Section -->
+            <section id="home-section">
+                <div class="glass-card p-6 mb-6 bg-slate-900 text-white">
+                    <p class="text-slate-400 text-xs font-bold uppercase tracking-widest mb-1">ยอดเงินสะสมทั้งหมด</p>
                     <div class="flex items-baseline space-x-2">
-                        <h2 id="total-savings" class="text-5xl font-black text-slate-900 tracking-tighter">0.00</h2>
-                        <span class="text-blue-600 font-black text-xl">฿</span>
+                        <h2 id="total-savings" class="text-4xl font-black">0.00</h2>
+                        <span class="text-blue-400 text-lg">฿</span>
+                    </div>
+                </div>
+
+                <div class="glass-card p-6 mb-6">
+                    <div class="flex justify-between mb-2">
+                        <span id="goal-percent" class="font-bold text-blue-600">0%</span>
+                        <span id="target-display" class="text-xs text-slate-400">เป้าหมาย: 5,000 ฿</span>
+                    </div>
+                    <div class="w-full h-3 bg-slate-100 rounded-full overflow-hidden">
+                        <div id="goal-progress" class="h-full bg-blue-600 w-0 transition-all duration-1000"></div>
+                    </div>
+                </div>
+
+                <div class="glass-card p-6 mb-6">
+                    <input type="number" id="save-amount" placeholder="0.00" class="w-full p-4 bg-slate-50 border-none rounded-2xl text-2xl font-bold mb-4 outline-none focus:ring-2 ring-blue-500">
+                    <div class="grid grid-cols-2 gap-4">
+                        <button onclick="addEntry('save')" class="py-4 bg-blue-600 text-white rounded-2xl font-bold shadow-lg active:scale-95 transition-transform">+ รายรับ/ออม</button>
+                        <button onclick="addEntry('spend')" class="py-4 bg-white border border-slate-200 text-slate-600 rounded-2xl font-bold active:scale-95 transition-transform">- รายจ่าย</button>
                     </div>
                 </div>
 
                 <div class="glass-card p-6">
-                    <div class="flex justify-between items-center mb-4">
-                        <span id="goal-percent" class="text-2xl font-black text-blue-600">0%</span>
-                        <span id="target-goal-display" class="text-[10px] font-bold text-slate-400 uppercase tracking-widest">เป้าหมาย: 5,000 ฿</span>
-                    </div>
-                    <div class="w-full h-4 bg-slate-100 rounded-full overflow-hidden mb-3">
-                        <div id="goal-progress" class="progress-fill h-full bg-gradient-to-r from-blue-400 to-blue-600 w-0"></div>
-                    </div>
-                </div>
-
-                <div class="glass-card p-6">
-                    <div class="flex space-x-2 mb-4">
-                        <input type="number" id="save-amount" placeholder="ระบุยอดเงิน..." inputmode="decimal" class="flex-1 p-5 bg-slate-50 border-2 border-slate-100 focus:border-blue-400 rounded-3xl outline-none text-2xl font-black text-slate-800 transition-all">
-                    </div>
-                    <div class="grid grid-cols-2 gap-3">
-                        <button onclick="handleTransaction('save')" class="py-4 bg-blue-600 text-white rounded-2xl font-bold btn-press shadow-lg shadow-blue-100 flex items-center justify-center space-x-2">
-                            <i class="fa-solid fa-plus"></i> <span>เงินออม</span>
-                        </button>
-                        <button onclick="handleTransaction('spend')" class="py-4 bg-white border-2 border-slate-100 text-slate-600 rounded-2xl font-bold btn-press flex items-center justify-center space-x-2">
-                            <i class="fa-solid fa-minus"></i> <span>รายจ่าย</span>
-                        </button>
-                    </div>
-                </div>
-
-                <div class="glass-card p-6">
-                    <h3 class="font-bold text-slate-800 mb-4 flex items-center justify-between">
-                        <span>ประวัติล่าสุด</span>
-                        <span class="text-[10px] text-slate-400 font-normal">Auto-clear (2m)</span>
-                    </h3>
-                    <div id="history-list" class="space-y-3">
-                        <div class="text-center py-6 text-slate-300 text-xs italic">ไม่มีรายการล่าสุด</div>
+                    <h3 class="font-bold text-slate-800 mb-4">ประวัติการทำรายการ</h3>
+                    <div id="history-list" class="space-y-3 max-h-[300px] overflow-y-auto">
+                        <p class="text-center text-slate-400 py-4 italic text-sm">ยังไม่มีรายการ</p>
                     </div>
                 </div>
             </section>
 
-            <section id="graph-section" class="hidden-section space-y-6">
-                <div class="glass-card p-6">
-                    <h3 class="font-bold text-slate-800 mb-6">ความคืบหน้า 7 วัน</h3>
-                    <div class="h-[250px]"><canvas id="permanentChart"></canvas></div>
-                </div>
-                <div class="glass-card p-6">
-                    <h3 class="font-bold text-slate-800 mb-4">เกียรติยศนักออม</h3>
-                    <div class="grid grid-cols-4 gap-4" id="badges-container"></div>
+            <!-- Stats Section -->
+            <section id="graph-section" class="hidden-section">
+                <div class="glass-card p-6 mb-6">
+                    <h3 class="font-bold text-slate-800 mb-6 text-center">สถิติ 7 วันล่าสุด</h3>
+                    <div class="h-[250px]"><canvas id="statsChart"></canvas></div>
                 </div>
             </section>
 
-            <section id="settings-section" class="hidden-section space-y-6">
-                <div class="glass-card p-6">
-                    <h3 class="font-bold text-slate-800 mb-4 text-center">🔐 ระบบความปลอดภัย</h3>
-                    <div class="bg-blue-50 p-4 rounded-2xl text-blue-700 text-xs text-center font-medium">
-                        PIN 4 หลักของคุณเปิดใช้งานแล้ว<br>ระบบไม่อนุญาตให้แก้ไขรหัสเพื่อความปลอดภัยสูงสุด
-                    </div>
-                </div>
-                <div class="glass-card p-6">
+            <!-- Settings Section -->
+            <section id="settings-section" class="hidden-section">
+                <div class="glass-card p-6 mb-6">
                     <h3 class="font-bold text-slate-800 mb-4">ตั้งเป้าหมายรายเดือน</h3>
-                    <div class="flex space-x-3">
-                        <input type="number" id="goal-input" class="flex-1 p-4 bg-slate-100 rounded-2xl font-bold outline-none">
-                        <button onclick="updateGoal()" class="px-6 bg-slate-900 text-white font-bold rounded-2xl btn-press">อัปเดต</button>
-                    </div>
+                    <input type="number" id="goal-input" class="w-full p-4 bg-slate-50 rounded-2xl font-bold mb-4">
+                    <button onclick="saveGoal()" class="w-full py-4 bg-slate-900 text-white rounded-2xl font-bold">บันทึกเป้าหมาย</button>
                 </div>
+                <button onclick="resetData()" class="w-full py-4 text-red-500 font-bold opacity-50">ล้างข้อมูลทั้งหมด (Reset)</button>
             </section>
 
-            <nav class="fixed bottom-0 left-0 right-0 h-24 bg-white/90 backdrop-blur-3xl border-t border-slate-100 px-8 flex justify-around items-center z-50">
-                <button onclick="switchTab('home')" id="nav-home" class="nav-item active">
-                    <i class="fa-solid fa-house-chimney text-xl mb-1.5"></i>
-                    <span class="text-[9px] font-black uppercase">Home</span>
-                </button>
-                <button onclick="switchTab('graph')" id="nav-graph" class="nav-item">
-                    <i class="fa-solid fa-chart-pie text-xl mb-1.5"></i>
-                    <span class="text-[9px] font-black uppercase">Stats</span>
-                </button>
-                <button onclick="switchTab('settings')" id="nav-settings" class="nav-item">
-                    <i class="fa-solid fa-gear text-xl mb-1.5"></i>
-                    <span class="text-[9px] font-black uppercase">Settings</span>
-                </button>
+            <!-- Nav -->
+            <nav class="fixed bottom-0 left-0 right-0 h-20 bg-white border-t flex justify-around items-center px-6">
+                <button onclick="switchTab('home')" class="nav-item active flex flex-col items-center"><i class="fa-solid fa-house"></i><span class="text-[10px] font-bold mt-1">หน้าหลัก</span></button>
+                <button onclick="switchTab('graph')" class="nav-item flex flex-col items-center"><i class="fa-solid fa-chart-line"></i><span class="text-[10px] font-bold mt-1">สถิติ</span></button>
+                <button onclick="switchTab('settings')" class="nav-item flex flex-col items-center"><i class="fa-solid fa-gear"></i><span class="text-[10px] font-bold mt-1">ตั้งค่า</span></button>
             </nav>
         </div>
     </div>
 
     <script>
-        const KEY = 'savings_app_v25_pin';
-        const PIN_KEY = 'savings_app_lock_v1';
-        const LOCKOUT_KEY = 'savings_app_lockout_until';
-        const ATTEMPTS_KEY = 'savings_app_wrong_attempts';
-        const EXPIRY = 2 * 60 * 1000;
+        // ชื่อ Key สำหรับบันทึกข้อมูลแบบคงที่
+        const APP_DATA_KEY = 'my_savings_app_data_secure';
+        const PIN_KEY = 'my_savings_app_pin';
+        const LOCKOUT_KEY = 'my_savings_lockout_time';
+        const ATTEMPTS_KEY = 'my_savings_wrong_attempts';
 
         let state = {
-            totalBalance: 0,
-            totalCount: 0,
-            monthlyGoal: 5000,
-            dailyStats: {},
-            savingsHistory: [],
+            balance: 0,
+            goal: 5000,
             streak: 0,
-            lastSavedDate: null
+            lastDate: null,
+            history: [], // รายการประวัติไม่ลบอัตโนมัติ
+            daily: {}
         };
 
-        let currentPinInput = "";
-        let storedPin = localStorage.getItem(PIN_KEY);
-        let wrongAttempts = parseInt(localStorage.getItem(ATTEMPTS_KEY) || "0");
-        let lockoutInterval = null;
+        let currentPin = "";
+        let lockoutTimer = null;
 
         function init() {
-            if (storedPin) {
-                document.getElementById('pin-label').innerText = "กรุณาใส่รหัส PIN เพื่อปลดล็อก";
+            // 1. ดึงข้อมูลจากหลายชื่อตัวแปรเผื่อข้อมูลหาย (Migration)
+            const oldData1 = localStorage.getItem('savings_app_v25');
+            const oldData2 = localStorage.getItem('savings_app_v25_pin');
+            const currentData = localStorage.getItem(APP_DATA_KEY);
+            
+            let finalData = currentData || oldData2 || oldData1;
+            
+            if (finalData) {
+                try { 
+                    state = { ...state, ...JSON.parse(finalData) }; 
+                    // บันทึกกลับด้วย Key ใหม่ที่ถาวร
+                    saveData();
+                } catch(e) { console.error("Data parse error"); }
             }
 
-            // Check for existing lockout on refresh
+            // 2. เช็คการล็อค
             const lockoutUntil = localStorage.getItem(LOCKOUT_KEY);
             if (lockoutUntil && Date.now() < parseInt(lockoutUntil)) {
-                startLockoutTimer(parseInt(lockoutUntil));
+                startLockout(parseInt(lockoutUntil));
             }
 
+            // 3. แสดงวันที่
             const opts = { weekday: 'long', day: 'numeric', month: 'long' };
-            const dateEl = document.getElementById('current-date');
-            if (dateEl) dateEl.innerText = new Intl.DateTimeFormat('th-TH', opts).format(new Date());
+            document.getElementById('current-date').innerText = new Intl.DateTimeFormat('th-TH', opts).format(new Date());
 
-            let loadedData = localStorage.getItem(KEY);
-            if (loadedData) {
-                try { state = { ...state, ...JSON.parse(loadedData) }; } catch(e) {}
-            }
-
-            cleanupHistory();
-            checkStreaks();
             updateUI();
-            
-            setInterval(cleanupHistory, 2000);
-            setInterval(updateCountdownUI, 1000);
         }
 
-        // --- PIN & Lockout Logic ---
-        function pressKey(num) {
-            if (num === 'del') {
-                currentPinInput = currentPinInput.slice(0, -1);
-            } else if (currentPinInput.length < 4) {
-                currentPinInput += num;
+        function saveData() {
+            localStorage.setItem(APP_DATA_KEY, JSON.stringify(state));
+        }
+
+        // --- PIN Logic ---
+        function pressKey(val) {
+            if (val === 'del') {
+                currentPin = currentPin.slice(0, -1);
+            } else if (currentPin.length < 4) {
+                currentPin += val;
             }
-            updatePinDots();
-            if (currentPinInput.length === 4) setTimeout(validatePin, 200);
+            updateDots();
+            if (currentPin.length === 4) setTimeout(checkPin, 200);
         }
 
-        function updatePinDots() {
+        function updateDots() {
             for (let i = 0; i < 4; i++) {
                 const dot = document.getElementById(`dot-${i}`);
-                if (i < currentPinInput.length) dot.classList.add('filled');
+                if (i < currentPin.length) dot.classList.add('filled');
                 else dot.classList.remove('filled');
             }
         }
 
-        function validatePin() {
-            if (!storedPin) {
-                localStorage.setItem(PIN_KEY, currentPinInput);
-                storedPin = currentPinInput;
-                unlockApp();
+        function checkPin() {
+            const savedPin = localStorage.getItem(PIN_KEY);
+            if (!savedPin) {
+                localStorage.setItem(PIN_KEY, currentPin);
+                unlock();
             } else {
-                if (currentPinInput === storedPin) {
-                    wrongAttempts = 0;
+                if (currentPin === savedPin) {
                     localStorage.setItem(ATTEMPTS_KEY, "0");
-                    unlockApp();
+                    unlock();
                 } else {
-                    wrongAttempts++;
-                    localStorage.setItem(ATTEMPTS_KEY, wrongAttempts.toString());
+                    let attempts = parseInt(localStorage.getItem(ATTEMPTS_KEY) || "0") + 1;
+                    localStorage.setItem(ATTEMPTS_KEY, attempts.toString());
                     
-                    if (wrongAttempts >= 2) {
-                        const unlockTime = Date.now() + 60000; // 1 minute
-                        localStorage.setItem(LOCKOUT_KEY, unlockTime.toString());
-                        startLockoutTimer(unlockTime);
+                    if (attempts >= 2) {
+                        const unlockAt = Date.now() + 60000;
+                        localStorage.setItem(LOCKOUT_KEY, unlockAt.toString());
+                        startLockout(unlockAt);
                     } else {
-                        handleWrongPin();
+                        failPin("รหัสไม่ถูกต้อง ลองได้อีก 1 ครั้ง");
                     }
                 }
             }
         }
 
-        function handleWrongPin() {
-            currentPinInput = "";
-            updatePinDots();
-            
+        function failPin(msg) {
+            currentPin = "";
+            updateDots();
             const label = document.getElementById('pin-label');
-            const dots = document.getElementById('dots-container');
-            
-            dots.classList.add('shake');
-            label.innerText = "รหัส PIN ไม่ถูกต้อง! (อีก 1 ครั้งจะถูกล็อค)";
+            label.innerText = msg;
             label.classList.add('text-red-500');
-            
+            document.getElementById('dots-container').classList.add('shake');
             setTimeout(() => {
-                dots.classList.remove('shake');
-                label.innerText = "กรุณาใส่รหัส PIN เพื่อปลดล็อก";
                 label.classList.remove('text-red-500');
+                document.getElementById('dots-container').classList.remove('shake');
+                label.innerText = "กรุณากรอกรหัส PIN";
             }, 1000);
         }
 
-        function startLockoutTimer(until) {
-            currentPinInput = "";
-            updatePinDots();
-            
-            const label = document.getElementById('pin-label');
-            const subLabel = document.getElementById('pin-sub-label');
-            const iconBox = document.getElementById('pin-icon-box');
+        function startLockout(until) {
+            currentPin = "";
+            updateDots();
             const btns = document.querySelectorAll('.keypad-btn');
-            
             btns.forEach(b => b.disabled = true);
-            iconBox.classList.replace('bg-blue-50', 'bg-red-50');
-            iconBox.classList.replace('text-blue-600', 'text-red-600');
             
-            lockoutInterval = setInterval(() => {
-                const remaining = Math.ceil((until - Date.now()) / 1000);
-                if (remaining <= 0) {
-                    clearInterval(lockoutInterval);
-                    resetLockoutUI();
+            lockoutTimer = setInterval(() => {
+                const left = Math.ceil((until - Date.now()) / 1000);
+                if (left <= 0) {
+                    clearInterval(lockoutTimer);
+                    btns.forEach(b => b.disabled = false);
+                    localStorage.setItem(ATTEMPTS_KEY, "0");
+                    localStorage.removeItem(LOCKOUT_KEY);
+                    document.getElementById('pin-label').innerText = "กรุณากรอกรหัส PIN";
+                    document.getElementById('pin-sub-label').innerText = "ปลดล็อคแล้ว ลองใหม่อีกครั้ง";
                 } else {
-                    label.innerText = "ระบบถูกระงับชั่วคราว";
-                    subLabel.innerText = `ลองใหม่ในอีก ${remaining} วินาที`;
-                    subLabel.classList.add('text-red-500', 'font-bold');
+                    document.getElementById('pin-label').innerText = "ระบบถูกระงับ";
+                    document.getElementById('pin-sub-label').innerText = `ลองใหม่ในอีก ${left} วินาที`;
                 }
             }, 1000);
         }
 
-        function resetLockoutUI() {
-            const label = document.getElementById('pin-label');
-            const subLabel = document.getElementById('pin-sub-label');
-            const iconBox = document.getElementById('pin-icon-box');
-            const btns = document.querySelectorAll('.keypad-btn');
-            
-            wrongAttempts = 0;
-            localStorage.setItem(ATTEMPTS_KEY, "0");
-            localStorage.removeItem(LOCKOUT_KEY);
-            
-            btns.forEach(b => b.disabled = false);
-            iconBox.classList.replace('bg-red-50', 'bg-blue-50');
-            iconBox.classList.replace('text-red-600', 'text-blue-600');
-            label.innerText = "กรุณาใส่รหัส PIN เพื่อปลดล็อก";
-            subLabel.innerText = "เพื่อความปลอดภัยของข้อมูลคุณ";
-            subLabel.classList.remove('text-red-500', 'font-bold');
-        }
-
-        function unlockApp() {
-            const overlay = document.getElementById('pin-overlay');
+        function unlock() {
+            document.getElementById('pin-overlay').style.display = 'none';
             const main = document.getElementById('main-content');
-            overlay.style.opacity = "0";
-            main.style.opacity = "1";
-            document.body.style.overflow = "auto";
-            setTimeout(() => overlay.style.display = "none", 500);
+            main.style.display = 'block';
+            setTimeout(() => main.style.opacity = "1", 50);
         }
 
-        // --- Core Functions (Same logic as v2.5.0 PIN Lock) ---
-        function saveData() { localStorage.setItem(KEY, JSON.stringify(state)); }
-
-        function handleTransaction(type) {
+        // --- App Logic ---
+        function addEntry(type) {
             const input = document.getElementById('save-amount');
-            let val = parseFloat(input.value);
-            if (!val || val <= 0) return;
-            if (type === 'spend') val = -val;
-            const now = Date.now();
-            const dateKey = new Date().toISOString().split('T')[0];
-            state.totalBalance += val;
-            if (val > 0) {
-                state.totalCount += 1;
-                state.dailyStats[dateKey] = (state.dailyStats[dateKey] || 0) + val;
-                updateStreakCounter();
+            let amt = parseFloat(input.value);
+            if (!amt || amt <= 0) return;
+            
+            if (type === 'spend') amt = -amt;
+            
+            state.balance += amt;
+            const today = new Date().toISOString().split('T')[0];
+            
+            if (amt > 0) {
+                state.daily[today] = (state.daily[today] || 0) + amt;
+                if (state.lastDate !== today) {
+                    state.streak++;
+                    state.lastDate = today;
+                }
             }
-            state.savingsHistory.unshift({ id: now, amount: val, timestamp: now });
+            
+            state.history.unshift({
+                id: Date.now(),
+                amt: amt,
+                date: new Date().toLocaleString('th-TH')
+            });
+
+            input.value = "";
             saveData();
             updateUI();
-            input.value = '';
-            showToast(val > 0 ? `ออมเงิน +${val} ฿ 💎` : `รายจ่าย ${val} ฿ 💸`, val > 0 ? 'blue' : 'red');
-        }
-
-        function updateStreakCounter() {
-            const today = new Date().toISOString().split('T')[0];
-            if (state.lastSavedDate !== today) { state.streak += 1; state.lastSavedDate = today; }
-        }
-
-        function checkStreaks() {
-            if (!state.lastSavedDate) return;
-            const diff = Math.floor((new Date() - new Date(state.lastSavedDate)) / (1000 * 60 * 60 * 24));
-            if (diff > 1) state.streak = 0;
-        }
-
-        function cleanupHistory() {
-            const now = Date.now();
-            const len = state.savingsHistory.length;
-            state.savingsHistory = state.savingsHistory.filter(item => (now - item.timestamp) < EXPIRY);
-            if (state.savingsHistory.length !== len) { saveData(); updateHistoryUI(); }
         }
 
         function updateUI() {
-            const balanceEl = document.getElementById('total-savings');
-            if (balanceEl) balanceEl.innerText = state.totalBalance.toLocaleString(undefined, { minimumFractionDigits: 2 });
-            document.getElementById('target-goal-display').innerText = `เป้าหมาย: ${state.monthlyGoal.toLocaleString()} ฿`;
+            document.getElementById('total-savings').innerText = state.balance.toLocaleString(undefined, {minimumFractionDigits: 2});
             document.getElementById('streak-count').innerText = state.streak;
-            document.getElementById('goal-input').value = state.monthlyGoal;
+            document.getElementById('target-display').innerText = `เป้าหมาย: ${state.goal.toLocaleString()} ฿`;
+            document.getElementById('goal-input').value = state.goal;
 
-            const p = Math.min(Math.round((state.totalBalance / state.monthlyGoal) * 100), 100);
+            const p = Math.min(100, Math.round((state.balance / state.goal) * 100));
             document.getElementById('goal-percent').innerText = `${p}%`;
             document.getElementById('goal-progress').style.width = `${p}%`;
 
-            calculateForecast();
-            updateHistoryUI();
-            updateBadges();
-        }
-
-        function calculateForecast() {
-            const values = Object.values(state.dailyStats);
-            const avg = values.length ? (values.reduce((a,b) => a+b, 0) / values.length) : 0;
-            const remaining = state.monthlyGoal - state.totalBalance;
-            document.getElementById('avg-daily').innerText = Math.round(avg).toLocaleString();
-            const daysLeftEl = document.getElementById('days-left');
-            if (remaining <= 0) daysLeftEl.innerText = "0";
-            else if (avg <= 0) daysLeftEl.innerText = "∞";
-            else daysLeftEl.innerText = Math.ceil(remaining / avg);
-        }
-
-        function updateHistoryUI() {
             const list = document.getElementById('history-list');
-            if (!list) return;
-            if (state.savingsHistory.length === 0) {
-                list.innerHTML = `<div class="text-center py-6 text-slate-300 text-xs italic">ไม่มีรายการล่าสุด</div>`;
-                return;
-            }
-            list.innerHTML = state.savingsHistory.map(item => {
-                const isSave = item.amount > 0;
-                const remaining = Math.max(0, EXPIRY - (Date.now() - item.timestamp));
-                const s = Math.floor((remaining % 60000) / 1000);
-                const m = Math.floor(remaining / 60000);
-                return `
-                    <div class="flex justify-between items-center p-4 bg-white border border-slate-100 rounded-2xl shadow-sm">
-                        <div class="flex items-center space-x-3">
-                            <div class="w-10 h-10 rounded-xl ${isSave ? 'bg-blue-50 text-blue-600' : 'bg-red-50 text-red-600'} flex items-center justify-center"><i class="fa-solid ${isSave ? 'fa-arrow-up' : 'fa-arrow-down'}"></i></div>
-                            <div>
-                                <p class="text-base font-bold ${isSave ? 'text-slate-800' : 'text-red-500'}">${isSave ? '+' : ''}${item.amount.toLocaleString()} ฿</p>
-                                <p id="timer-${item.id}" class="text-[9px] font-black uppercase text-slate-400">EXPIRING IN ${m}:${s.toString().padStart(2, '0')}</p>
-                            </div>
+            if (state.history.length === 0) {
+                list.innerHTML = '<p class="text-center text-slate-400 py-4 italic text-sm">ยังไม่มีรายการ</p>';
+            } else {
+                list.innerHTML = state.history.map(item => `
+                    <div class="flex justify-between items-center p-4 bg-slate-50 rounded-2xl">
+                        <div>
+                            <p class="font-bold ${item.amt > 0 ? 'text-slate-800' : 'text-red-500'}">
+                                ${item.amt > 0 ? '+' : ''}${item.amt.toLocaleString()} ฿
+                            </p>
+                            <p class="text-[10px] text-slate-400 uppercase">${item.date}</p>
                         </div>
+                        <i class="fa-solid ${item.amt > 0 ? 'fa-circle-plus text-blue-500' : 'fa-circle-minus text-red-400'}"></i>
                     </div>
-                `;
-            }).join('');
-        }
-
-        function updateCountdownUI() {
-            state.savingsHistory.forEach(item => {
-                const el = document.getElementById(`timer-${item.id}`);
-                if (!el) return;
-                const remaining = Math.max(0, EXPIRY - (Date.now() - item.timestamp));
-                const s = Math.floor((remaining % 60000) / 1000), m = Math.floor(remaining / 60000);
-                el.innerText = `EXPIRING IN ${m}:${s.toString().padStart(2, '0')}`;
-                if (remaining < 15000) el.classList.add('text-red-500', 'animate-pulse');
-            });
-        }
-
-        function updateBadges() {
-            const container = document.getElementById('badges-container');
-            const data = [
-                { icon: 'fa-rocket', label: 'นักออม', ok: state.totalCount >= 1 },
-                { icon: 'fa-fire', label: 'วินัย', ok: state.streak >= 3 },
-                { icon: 'fa-gem', label: 'มั่งคั่ง', ok: state.totalBalance >= state.monthlyGoal },
-                { icon: 'fa-shield-halved', label: 'ปลอดภัย', ok: true }
-            ];
-            container.innerHTML = data.map(b => `
-                <div class="flex flex-col items-center space-y-1">
-                    <div class="w-12 h-12 rounded-2xl flex items-center justify-center ${b.ok ? 'bg-amber-100 text-amber-600' : 'bg-slate-100 text-slate-300 opacity-50'}"><i class="fa-solid ${b.icon}"></i></div>
-                    <span class="text-[8px] font-black uppercase text-center">${b.label}</span>
-                </div>
-            `).join('');
+                `).join('');
+            }
         }
 
         window.switchTab = (tab) => {
-            ['home', 'graph', 'settings'].forEach(t => {
-                const section = document.getElementById(`${t}-section`);
-                const navBtn = document.getElementById(`nav-${t}`);
-                if (section) section.style.display = (t === tab) ? 'block' : 'none';
-                if (navBtn) navBtn.classList.toggle('active', t === tab);
-            });
-            if (tab === 'graph') setTimeout(renderChart, 100);
+            document.querySelectorAll('section').forEach(s => s.classList.add('hidden-section'));
+            document.getElementById(`${tab}-section`).classList.remove('hidden-section');
+            document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+            event.currentTarget.classList.add('active');
+            if (tab === 'graph') drawChart();
         };
 
-        window.updateGoal = () => {
-            const input = document.getElementById('goal-input');
-            const val = parseFloat(input.value);
-            if (val > 0) { state.monthlyGoal = val; saveData(); updateUI(); showToast("อัปเดตเป้าหมายแล้ว 🎯", "blue"); }
+        window.saveGoal = () => {
+            state.goal = parseFloat(document.getElementById('goal-input').value) || 5000;
+            saveData();
+            updateUI();
+            alert("บันทึกเป้าหมายแล้ว");
         };
 
-        function showToast(msg, color) {
-            const t = document.getElementById('toast'), icon = document.getElementById('toast-icon'), msgEl = document.getElementById('toast-msg');
-            msgEl.innerText = msg;
-            icon.className = `w-8 h-8 rounded-full flex items-center justify-center ${color === 'red' ? 'bg-red-500' : 'bg-blue-500'}`;
-            t.classList.add('show');
-            setTimeout(() => t.classList.remove('show'), 3000);
-        }
+        window.resetData = () => {
+            if (confirm("ต้องการลบข้อมูลทั้งหมดรวมถึงรหัส PIN ใช่หรือไม่?")) {
+                localStorage.clear();
+                location.reload();
+            }
+        };
 
-        let chartInstance = null;
-        function renderChart() {
-            const canvas = document.getElementById('permanentChart');
-            if (!canvas) return;
-            const ctx = canvas.getContext('2d');
-            const dates = Object.keys(state.dailyStats).sort().slice(-7);
-            const data = dates.map(d => state.dailyStats[d]), labels = dates.map(d => d.split('-').slice(2).join('/'));
-            if (chartInstance) chartInstance.destroy();
-            chartInstance = new Chart(ctx, {
-                type: 'line',
-                data: { labels, datasets: [{ label: 'เงินออม', data, borderColor: '#3b82f6', backgroundColor: 'rgba(59, 130, 246, 0.1)', fill: true, tension: 0.4 }] },
-                options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { y: { beginAtZero: true, grid: { display: false } }, x: { grid: { display: false } } } }
+        let chart = null;
+        function drawChart() {
+            const ctx = document.getElementById('statsChart').getContext('2d');
+            const labels = [], data = [];
+            for (let i = 6; i >= 0; i--) {
+                const d = new Date();
+                d.setDate(d.getDate() - i);
+                const k = d.toISOString().split('T')[0];
+                labels.push(d.getDate() + '/' + (d.getMonth()+1));
+                data.push(state.daily[k] || 0);
+            }
+            if (chart) chart.destroy();
+            chart = new Chart(ctx, {
+                type: 'bar',
+                data: { labels, datasets: [{ label: 'เงินออม', data, backgroundColor: '#3b82f6', borderRadius: 8 }] },
+                options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } } }
             });
         }
 
