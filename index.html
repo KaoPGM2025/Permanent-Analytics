@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Savings Tracker v3.3.0</title>
+    <title>Savings Tracker v3.3.0 (Stable)</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
@@ -120,7 +120,6 @@
         #history-box::-webkit-scrollbar-track { background: transparent; }
         #history-box::-webkit-scrollbar-thumb { background: #e2e8f0; border-radius: 10px; }
 
-        /* Toast Styles */
         #toast {
             position: fixed;
             top: 20px;
@@ -146,13 +145,13 @@
 </head>
 <body>
 
-    <!-- Notification Toast -->
+    <!-- แจ้งเตือน Toast -->
     <div id="toast" class="bg-slate-900 text-white px-6 py-3 rounded-full shadow-2xl flex items-center space-x-3 text-sm font-bold">
         <i id="toast-icon" class="fa-solid fa-check-circle text-emerald-400"></i>
         <span id="toast-msg">บันทึกเรียบร้อย</span>
     </div>
 
-    <!-- PIN Screen -->
+    <!-- หน้าจอรหัสผ่าน (PIN) -->
     <div id="pin-overlay">
         <div class="text-center mb-10">
             <div id="pin-icon-box" class="w-24 h-24 bg-white shadow-xl text-indigo-500 rounded-[2.5rem] flex items-center justify-center mx-auto mb-6 text-4xl">
@@ -185,7 +184,7 @@
         </div>
     </div>
 
-    <!-- Main UI -->
+    <!-- อินเตอร์เฟซหลัก -->
     <div id="main-ui" style="display:none; opacity:0; transition: 0.7s cubic-bezier(0.4, 0, 0.2, 1);">
         <div class="max-w-md mx-auto p-6">
             
@@ -200,9 +199,8 @@
                 </div>
             </header>
 
-            <!-- Home Section -->
             <main id="home-section" class="space-y-6">
-                <!-- Balance Card -->
+                <!-- การ์ดยอดเงิน -->
                 <div class="glass-card p-8 bg-indigo-600 text-white relative overflow-hidden shadow-2xl shadow-indigo-100">
                     <div class="absolute -right-6 -bottom-6 w-32 h-32 bg-white/10 rounded-full blur-3xl"></div>
                     <div class="absolute -left-6 -top-6 w-24 h-24 bg-indigo-400/20 rounded-full blur-2xl"></div>
@@ -214,7 +212,7 @@
                     </div>
                 </div>
 
-                <!-- Goal Card -->
+                <!-- การ์ดเป้าหมาย -->
                 <div class="glass-card p-6">
                     <div class="flex justify-between items-end mb-4">
                         <div>
@@ -228,13 +226,13 @@
                     </div>
                 </div>
 
-                <!-- Input Area -->
+                <!-- ส่วนป้อนข้อมูล -->
                 <div class="glass-card p-6 space-y-4">
                     <div class="flex justify-between items-center mb-1">
                         <p class="text-[10px] font-black text-slate-400 uppercase tracking-widest">เลือกหมวดหมู่</p>
                     </div>
                     <div id="category-list" class="flex space-x-2 overflow-x-auto pb-2 scrollbar-hide">
-                        <!-- Categories will be injected here -->
+                        <!-- รายการหมวดหมู่ -->
                     </div>
 
                     <div class="relative">
@@ -251,7 +249,7 @@
                     </div>
                 </div>
 
-                <!-- History Area -->
+                <!-- รายการล่าสุด -->
                 <div class="glass-card p-6">
                     <div class="flex justify-between items-center mb-5">
                         <h4 class="font-bold text-slate-800 flex items-center space-x-2">
@@ -261,12 +259,12 @@
                         <span class="text-[9px] bg-slate-100 px-2 py-1 rounded-md text-slate-500 font-bold uppercase tracking-wider">7 วันล่าสุด</span>
                     </div>
                     <div id="history-box" class="space-y-3 max-h-[350px] overflow-y-auto pr-1">
-                        <!-- History items will appear here -->
+                        <!-- รายการประวัติจะแสดงที่นี่ -->
                     </div>
                 </div>
             </main>
 
-            <!-- Stats Section -->
+            <!-- ส่วนสถิติ -->
             <section id="stats-section" class="hidden-section space-y-6">
                 <div class="glass-card p-6">
                     <h3 class="font-bold text-slate-800 mb-6 flex items-center space-x-2">
@@ -287,7 +285,7 @@
                 </div>
             </section>
 
-            <!-- Settings Section -->
+            <!-- ส่วนตั้งค่า -->
             <section id="settings-section" class="hidden-section space-y-6">
                 <div class="glass-card p-6">
                     <h3 class="font-bold text-slate-800 mb-4">ตั้งเป้าหมาย</h3>
@@ -303,15 +301,15 @@
                         </div>
                         <div>
                             <h4 class="font-bold text-slate-800">เวอร์ชัน 3.3.0</h4>
-                            <p class="text-xs text-slate-400 tracking-tight">เพิ่มระบบหมวดหมู่และการแจ้งเตือน</p>
+                            <p class="text-xs text-slate-400 tracking-tight">แสดงรายการล่าสุดไว้ด้านบนสุด</p>
                         </div>
                     </div>
-                    <p class="text-xs text-slate-500 leading-relaxed italic">*ระบบจะเก็บข้อมูลยอดเงินและประวัติการออมของคุณไว้อย่างปลอดภัยในเบราว์เซอร์ และจะแสดงผลทุกครั้งที่คุณเปิดแอพ</p>
+                    <p class="text-xs text-slate-500 leading-relaxed italic">*ระบบจะดึงข้อมูลเดิมจากเวอร์ชันก่อนหน้ามาโดยอัตโนมัติ ข้อมูลของคุณจะไม่สูญหายเมื่อเปิดแอปใหม่</p>
                 </div>
                 <button onclick="wipe()" class="w-full py-4 text-red-400 font-bold text-sm bg-red-50 rounded-2xl">รีเซ็ตข้อมูลทั้งหมด (Reset)</button>
             </section>
 
-            <!-- Navigation -->
+            <!-- เมนูการนำทาง -->
             <div class="fixed bottom-8 left-6 right-6 z-[1000]">
                 <nav class="modern-nav h-20 flex justify-around items-center px-4">
                     <button onclick="tab('home')" id="btn-home" class="nav-item active flex flex-col items-center flex-1">
@@ -334,6 +332,7 @@
 
     <script>
         const VERSION = "3.3.0";
+        // ใช้ KEY เดิมเพื่อให้ข้อมูลไม่หาย
         const STORAGE_KEY = "wallet_v3_core_data"; 
         const PIN_KEY = "wallet_v3_pin_secure";
         const LOCK_UNTIL_KEY = "wallet_v3_lockout";
@@ -362,33 +361,24 @@
         let timer = null;
 
         function init() {
+            // ดึงข้อมูลเก่ามาใช้
             const rawData = localStorage.getItem(STORAGE_KEY);
             
             if (rawData) {
                 try {
                     const parsed = JSON.parse(rawData);
-                    // ป้องกันข้อมูลหาย: รับค่าเดิมมาทั้งหมด และทับด้วยเวอร์ชันใหม่
+                    // ผสานข้อมูลเดิมเข้ากับ Version 3.3.0
                     state = {
-                        ...state, // ค่าเริ่มต้น
-                        ...parsed, // ค่าเก่าที่โหลดมา
-                        v: VERSION // อัปเกรดเวอร์ชัน
+                        ...state,
+                        ...parsed,
+                        v: VERSION 
                     };
                     
-                    // ป้องกันค่า balance เป็น null/undefined จากการแปลงไฟล์
-                    if (state.balance === null || state.balance === undefined) {
-                        state.balance = 0;
-                    }
+                    if (state.balance === null || state.balance === undefined) state.balance = 0;
 
                     cleanOldHistory();
                     save(); 
-                } catch(e) { 
-                    console.error("Load Error:", e); 
-                }
-            }
-
-            const oldPin = localStorage.getItem('my_savings_app_pin') || localStorage.getItem('savings_app_lock_v1');
-            if (oldPin && !localStorage.getItem(PIN_KEY)) {
-                localStorage.setItem(PIN_KEY, oldPin);
+                } catch(e) { console.error("Load Error:", e); }
             }
 
             const now = new Date();
@@ -418,9 +408,7 @@
             const toast = document.getElementById('toast');
             const icon = document.getElementById('toast-icon');
             document.getElementById('toast-msg').innerText = msg;
-            
             icon.className = isError ? "fa-solid fa-circle-exclamation text-rose-400" : "fa-solid fa-check-circle text-emerald-400";
-            
             toast.classList.add('show');
             setTimeout(() => toast.classList.remove('show'), 2500);
         }
@@ -430,6 +418,8 @@
             const now = Date.now();
             if (state.history && state.history.length > 0) {
                 state.history = state.history.filter(item => (now - item.id) < ONE_WEEK);
+                // เรียงลำดับประวัติเก่าใหม่ล่าสุดไว้บนสุด (เผื่อกรณีข้อมูลเก่าเรียงผิด)
+                state.history.sort((a, b) => b.id - a.id);
             }
         }
 
@@ -464,9 +454,7 @@
                     const until = Date.now() + 60000;
                     localStorage.setItem(LOCK_UNTIL_KEY, until.toString());
                     checkLock();
-                } else {
-                    failPin("รหัสไม่ถูกต้อง!");
-                }
+                } else { failPin("รหัสไม่ถูกต้อง!"); }
             }
         }
 
@@ -527,7 +515,6 @@
             }
 
             if (type === 'spend') val = -val;
-            
             state.balance += val;
 
             const today = new Date().toISOString().split('T')[0];
@@ -541,6 +528,7 @@
 
             const cat = CATEGORIES.find(c => c.id === selectedCat);
 
+            // บันทึกรายการล่าสุดไว้ตำแหน่งแรกสุด (index 0)
             state.history.unshift({
                 id: Date.now(),
                 val: val,
@@ -606,8 +594,7 @@
 
         window.updateGoal = () => {
             state.goal = parseFloat(document.getElementById('goal-input').value) || 5000;
-            save();
-            updateUI();
+            save(); updateUI();
             showToast("อัปเดตเป้าหมายแล้ว");
         };
 
@@ -623,35 +610,25 @@
             const ctx = document.getElementById('mainChart').getContext('2d');
             const labels = [], vals = [];
             let total = 0, count = 0, max = 0;
-
             for (let i=6; i>=0; i--) {
-                const d = new Date();
-                d.setDate(d.getDate() - i);
+                const d = new Date(); d.setDate(d.getDate() - i);
                 const k = d.toISOString().split('T')[0];
                 const v = state.dailyStats[k] || 0;
                 labels.push(d.getDate() + '/' + (d.getMonth()+1));
                 vals.push(v);
                 if (v > 0) { total += v; count++; if (v > max) max = v; }
             }
-
             document.getElementById('max-save-val').innerText = max.toLocaleString() + ' ฿';
             document.getElementById('avg-save-val').innerText = (count ? Math.round(total/count) : 0).toLocaleString() + ' ฿';
-
             if (myChart) myChart.destroy();
             myChart = new Chart(ctx, {
                 type: 'bar',
                 data: {
                     labels,
-                    datasets: [{
-                        data: vals,
-                        backgroundColor: '#6366f1',
-                        borderRadius: 10,
-                        hoverBackgroundColor: '#4f46e5'
-                    }]
+                    datasets: [{ data: vals, backgroundColor: '#6366f1', borderRadius: 10, hoverBackgroundColor: '#4f46e5' }]
                 },
                 options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
+                    responsive: true, maintainAspectRatio: false,
                     plugins: { legend: { display: false } },
                     scales: { 
                         y: { beginAtZero: true, grid: { color: '#f8fafc' }, ticks: { font: { size: 10 } } },
