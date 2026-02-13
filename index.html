@@ -116,6 +116,11 @@
             transition: all 0.3s;
         }
         .btn-main:hover { opacity: 0.9; transform: translateY(-1px); }
+        
+        /* Custom Scrollbar for history */
+        #history-box::-webkit-scrollbar { width: 4px; }
+        #history-box::-webkit-scrollbar-track { background: transparent; }
+        #history-box::-webkit-scrollbar-thumb { background: #e2e8f0; border-radius: 10px; }
     </style>
 </head>
 <body>
@@ -217,12 +222,12 @@
                     <div class="flex justify-between items-center mb-5">
                         <h4 class="font-bold text-slate-800 flex items-center space-x-2">
                             <i class="fa-solid fa-clock-rotate-left text-indigo-500"></i>
-                            <span>ประวัติ (7 วันล่าสุด)</span>
+                            <span>รายการล่าสุด</span>
                         </h4>
-                        <span class="text-[9px] bg-slate-100 px-2 py-1 rounded-md text-slate-500 font-bold uppercase">Auto-Clean</span>
+                        <span class="text-[9px] bg-slate-100 px-2 py-1 rounded-md text-slate-500 font-bold uppercase tracking-wider">7 วันล่าสุด</span>
                     </div>
-                    <div id="history-box" class="space-y-4 max-h-[350px] overflow-y-auto pr-1">
-                        <!-- Items -->
+                    <div id="history-box" class="space-y-3 max-h-[350px] overflow-y-auto pr-1">
+                        <!-- รายการประวัติจะถูกแสดงที่นี่ -->
                     </div>
                 </div>
             </main>
@@ -295,7 +300,7 @@
 
     <script>
         const VERSION = "3.2.0";
-        const STORAGE_KEY = "wallet_v3_core_data"; // ใช้ Key เดิมเพื่อดึงข้อมูลเก่า
+        const STORAGE_KEY = "wallet_v3_core_data"; 
         const PIN_KEY = "wallet_v3_pin_secure";
         const LOCK_UNTIL_KEY = "wallet_v3_lockout";
         const WRONG_KEY = "wallet_v3_wrong_count";
@@ -314,7 +319,6 @@
         let timer = null;
 
         function init() {
-            // --- Super Data Bridge (Migration) ---
             const v3Data = localStorage.getItem(STORAGE_KEY);
             const v25Data = localStorage.getItem('my_savings_app_data_secure');
             const v2Data = localStorage.getItem('savings_app_v25');
@@ -332,19 +336,16 @@
                         v: VERSION
                     };
                     
-                    // --- Weekly Auto-Clean Feature ---
                     cleanOldHistory();
                     save();
                 } catch(e) { console.error("Load Error", e); }
             }
 
-            // PIN Sync
             const oldPin = localStorage.getItem('my_savings_app_pin') || localStorage.getItem('savings_app_lock_v1');
             if (oldPin && !localStorage.getItem(PIN_KEY)) {
                 localStorage.setItem(PIN_KEY, oldPin);
             }
 
-            // Setup Date
             const now = new Date();
             document.getElementById('date-display').innerText = new Intl.DateTimeFormat('th-TH', { weekday:'long', day:'numeric', month:'long' }).format(now);
             
@@ -357,9 +358,8 @@
             const now = Date.now();
             const originalLength = state.history.length;
             
-            // กรองเอาเฉพาะรายการที่อายุไม่เกิน 7 วัน
             state.history = state.history.filter(item => {
-                const itemTime = item.id; // ใช้ timestamp จาก id
+                const itemTime = item.id; 
                 return (now - itemTime) < ONE_WEEK;
             });
             
@@ -368,7 +368,6 @@
             }
         }
 
-        // --- PIN Interface ---
         function tapKey(k) {
             if (k === 'del') {
                 pinInput = pinInput.slice(0, -1);
@@ -450,7 +449,6 @@
             setTimeout(() => ui.style.opacity = "1", 50);
         }
 
-        // --- Main Actions ---
         function save() { localStorage.setItem(STORAGE_KEY, JSON.stringify(state)); }
 
         function record(type) {
@@ -494,22 +492,30 @@
 
             const box = document.getElementById('history-box');
             if (state.history.length === 0) {
-                box.innerHTML = `<p class="text-center py-10 text-slate-300 italic text-sm">ไม่มีประวัติ (หรือถูกล้างอัตโนมัติ)</p>`;
+                box.innerHTML = `<div class="flex flex-col items-center justify-center py-12 opacity-40">
+                    <i class="fa-solid fa-receipt text-4xl mb-3"></i>
+                    <p class="text-sm italic">ไม่มีรายการในสัปดาห์นี้</p>
+                </div>`;
             } else {
                 box.innerHTML = state.history.map(item => `
-                    <div class="flex justify-between items-center p-4 bg-white rounded-2xl border border-slate-50 shadow-sm">
-                        <div class="flex items-center space-x-3">
-                            <div class="w-10 h-10 rounded-xl flex items-center justify-center ${item.val > 0 ? 'bg-indigo-50 text-indigo-600' : 'bg-rose-50 text-rose-500'}">
-                                <i class="fa-solid ${item.val > 0 ? 'fa-plus' : 'fa-minus'}"></i>
+                    <div class="flex justify-between items-center p-4 bg-white rounded-2xl border border-slate-50 shadow-sm hover:shadow-md transition-shadow">
+                        <div class="flex items-center space-x-4">
+                            <div class="w-11 h-11 rounded-full flex items-center justify-center text-sm shadow-inner ${item.val > 0 ? 'bg-emerald-50 text-emerald-600' : 'bg-rose-50 text-rose-500'}">
+                                <i class="fa-solid ${item.val > 0 ? 'fa-arrow-down' : 'fa-arrow-up'}"></i>
                             </div>
                             <div>
-                                <p class="font-bold text-slate-800 text-sm">
-                                    ${item.val > 0 ? '+' : ''}${item.val.toLocaleString()} ฿
+                                <p class="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-0.5">${item.date} • ${item.time}</p>
+                                <p class="font-bold text-slate-800 text-base leading-none">
+                                    ${item.val > 0 ? 'ออมเงิน' : 'ใช้จ่าย'}
                                 </p>
-                                <p class="text-[9px] font-bold text-slate-400 uppercase tracking-tighter">${item.date} • ${item.time}</p>
                             </div>
                         </div>
-                        <span class="text-[9px] font-black uppercase tracking-widest px-2 py-1 rounded bg-slate-50 ${item.val > 0 ? 'text-indigo-400' : 'text-rose-300'}">${item.val > 0 ? 'Saved' : 'Spent'}</span>
+                        <div class="text-right">
+                            <p class="font-black text-lg ${item.val > 0 ? 'text-emerald-500' : 'text-rose-500'}">
+                                ${item.val > 0 ? '+' : ''}${item.val.toLocaleString()} ฿
+                            </p>
+                            <p class="text-[8px] font-bold text-slate-300 uppercase tracking-widest">Confirmed</p>
+                        </div>
                     </div>
                 `).join('');
             }
