@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Savings Tracker v3.2.0</title>
+    <title>Savings Tracker v3.3.0</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
@@ -35,7 +35,6 @@
             box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.03);
         }
 
-        /* New Modern Nav Theme */
         .modern-nav {
             background: rgba(255, 255, 255, 0.7);
             backdrop-filter: blur(20px);
@@ -117,13 +116,41 @@
         }
         .btn-main:hover { opacity: 0.9; transform: translateY(-1px); }
         
-        /* Custom Scrollbar for history */
         #history-box::-webkit-scrollbar { width: 4px; }
         #history-box::-webkit-scrollbar-track { background: transparent; }
         #history-box::-webkit-scrollbar-thumb { background: #e2e8f0; border-radius: 10px; }
+
+        /* Toast Styles */
+        #toast {
+            position: fixed;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%) translateY(-100px);
+            z-index: 3000;
+            transition: 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+        #toast.show { transform: translateX(-50%) translateY(0); }
+
+        .category-pill {
+            cursor: pointer;
+            transition: 0.2s;
+            border: 1px solid #f1f5f9;
+        }
+        .category-pill.selected {
+            background-color: var(--primary);
+            color: white;
+            border-color: var(--primary);
+            transform: scale(1.05);
+        }
     </style>
 </head>
 <body>
+
+    <!-- Notification Toast -->
+    <div id="toast" class="bg-slate-900 text-white px-6 py-3 rounded-full shadow-2xl flex items-center space-x-3 text-sm font-bold">
+        <i id="toast-icon" class="fa-solid fa-check-circle text-emerald-400"></i>
+        <span id="toast-msg">บันทึกเรียบร้อย</span>
+    </div>
 
     <!-- PIN Screen -->
     <div id="pin-overlay">
@@ -173,21 +200,21 @@
                 </div>
             </header>
 
-            <!-- Home -->
+            <!-- Home Section -->
             <main id="home-section" class="space-y-6">
-                <!-- Card -->
+                <!-- Balance Card -->
                 <div class="glass-card p-8 bg-indigo-600 text-white relative overflow-hidden shadow-2xl shadow-indigo-100">
                     <div class="absolute -right-6 -bottom-6 w-32 h-32 bg-white/10 rounded-full blur-3xl"></div>
                     <div class="absolute -left-6 -top-6 w-24 h-24 bg-indigo-400/20 rounded-full blur-2xl"></div>
                     
-                    <p class="text-indigo-100 text-[10px] font-bold uppercase tracking-[0.2em] mb-2 opacity-80">ยอดเงินคงเหลือ</p>
+                    <p class="text-indigo-100 text-[10px] font-bold uppercase tracking-[0.2em] mb-2 opacity-80">ยอดเงินคงเหลือปัจจุบัน</p>
                     <div class="flex items-baseline space-x-2">
                         <span class="text-indigo-200 text-2xl font-bold">฿</span>
                         <h2 id="balance-val" class="text-5xl font-black tracking-tight">0.00</h2>
                     </div>
                 </div>
 
-                <!-- Goal -->
+                <!-- Goal Card -->
                 <div class="glass-card p-6">
                     <div class="flex justify-between items-end mb-4">
                         <div>
@@ -201,8 +228,15 @@
                     </div>
                 </div>
 
-                <!-- Input -->
+                <!-- Input Area -->
                 <div class="glass-card p-6 space-y-4">
+                    <div class="flex justify-between items-center mb-1">
+                        <p class="text-[10px] font-black text-slate-400 uppercase tracking-widest">เลือกหมวดหมู่</p>
+                    </div>
+                    <div id="category-list" class="flex space-x-2 overflow-x-auto pb-2 scrollbar-hide">
+                        <!-- Categories will be injected here -->
+                    </div>
+
                     <div class="relative">
                         <input type="number" id="main-input" placeholder="0.00" class="w-full p-5 bg-slate-50 rounded-2xl text-3xl font-black text-slate-800 outline-none border-2 border-transparent focus:border-indigo-100 transition-all" inputmode="decimal">
                         <span class="absolute right-5 top-1/2 -translate-y-1/2 text-slate-300 font-bold">THB</span>
@@ -217,7 +251,7 @@
                     </div>
                 </div>
 
-                <!-- History -->
+                <!-- History Area -->
                 <div class="glass-card p-6">
                     <div class="flex justify-between items-center mb-5">
                         <h4 class="font-bold text-slate-800 flex items-center space-x-2">
@@ -227,12 +261,12 @@
                         <span class="text-[9px] bg-slate-100 px-2 py-1 rounded-md text-slate-500 font-bold uppercase tracking-wider">7 วันล่าสุด</span>
                     </div>
                     <div id="history-box" class="space-y-3 max-h-[350px] overflow-y-auto pr-1">
-                        <!-- รายการประวัติจะถูกแสดงที่นี่ -->
+                        <!-- History items will appear here -->
                     </div>
                 </div>
             </main>
 
-            <!-- Stats -->
+            <!-- Stats Section -->
             <section id="stats-section" class="hidden-section space-y-6">
                 <div class="glass-card p-6">
                     <h3 class="font-bold text-slate-800 mb-6 flex items-center space-x-2">
@@ -253,7 +287,7 @@
                 </div>
             </section>
 
-            <!-- Settings -->
+            <!-- Settings Section -->
             <section id="settings-section" class="hidden-section space-y-6">
                 <div class="glass-card p-6">
                     <h3 class="font-bold text-slate-800 mb-4">ตั้งเป้าหมาย</h3>
@@ -268,16 +302,16 @@
                             <i class="fa-solid fa-box-archive"></i>
                         </div>
                         <div>
-                            <h4 class="font-bold text-slate-800">เวอร์ชัน 3.2.0</h4>
-                            <p class="text-xs text-slate-400 tracking-tight">ระบบล้างประวัติรายสัปดาห์เปิดใช้งานแล้ว</p>
+                            <h4 class="font-bold text-slate-800">เวอร์ชัน 3.3.0</h4>
+                            <p class="text-xs text-slate-400 tracking-tight">เพิ่มระบบหมวดหมู่และการแจ้งเตือน</p>
                         </div>
                     </div>
-                    <p class="text-xs text-slate-500 leading-relaxed italic">*ระบบจะเก็บประวัติการออมของคุณไว้อย่างน้อย 7 วัน และจะลบรายการที่เก่ากว่านั้นออกโดยอัตโนมัติทุกครั้งที่เปิดแอพ เพื่อความรวดเร็วในการโหลดข้อมูล</p>
+                    <p class="text-xs text-slate-500 leading-relaxed italic">*ระบบจะเก็บข้อมูลยอดเงินและประวัติการออมของคุณไว้อย่างปลอดภัยในเบราว์เซอร์ และจะแสดงผลทุกครั้งที่คุณเปิดแอพ</p>
                 </div>
                 <button onclick="wipe()" class="w-full py-4 text-red-400 font-bold text-sm bg-red-50 rounded-2xl">รีเซ็ตข้อมูลทั้งหมด (Reset)</button>
             </section>
 
-            <!-- Floating Modern Nav -->
+            <!-- Navigation -->
             <div class="fixed bottom-8 left-6 right-6 z-[1000]">
                 <nav class="modern-nav h-20 flex justify-around items-center px-4">
                     <button onclick="tab('home')" id="btn-home" class="nav-item active flex flex-col items-center flex-1">
@@ -299,11 +333,19 @@
     </div>
 
     <script>
-        const VERSION = "3.2.0";
+        const VERSION = "3.3.0";
         const STORAGE_KEY = "wallet_v3_core_data"; 
         const PIN_KEY = "wallet_v3_pin_secure";
         const LOCK_UNTIL_KEY = "wallet_v3_lockout";
         const WRONG_KEY = "wallet_v3_wrong_count";
+
+        const CATEGORIES = [
+            { id: 'general', label: 'ทั่วไป', icon: 'fa-tags' },
+            { id: 'food', label: 'อาหาร', icon: 'fa-utensils' },
+            { id: 'travel', label: 'เดินทาง', icon: 'fa-bus' },
+            { id: 'shopping', label: 'ช้อปปิ้ง', icon: 'fa-bag-shopping' },
+            { id: 'home', label: 'ของใช้', icon: 'fa-house-laptop' }
+        ];
 
         let state = {
             v: VERSION,
@@ -315,30 +357,33 @@
             dailyStats: {}
         };
 
+        let selectedCat = 'general';
         let pinInput = "";
         let timer = null;
 
         function init() {
-            const v3Data = localStorage.getItem(STORAGE_KEY);
-            const v25Data = localStorage.getItem('my_savings_app_data_secure');
-            const v2Data = localStorage.getItem('savings_app_v25');
-            const raw = v3Data || v25Data || v2Data;
-
-            if (raw) {
+            const rawData = localStorage.getItem(STORAGE_KEY);
+            
+            if (rawData) {
                 try {
-                    const parsed = JSON.parse(raw);
+                    const parsed = JSON.parse(rawData);
+                    // ป้องกันข้อมูลหาย: รับค่าเดิมมาทั้งหมด และทับด้วยเวอร์ชันใหม่
                     state = {
-                        ...state,
-                        ...parsed,
-                        balance: parsed.balance ?? parsed.totalBalance ?? 0,
-                        history: parsed.history ?? parsed.savingsHistory ?? [],
-                        dailyStats: parsed.daily ?? parsed.dailyStats ?? {},
-                        v: VERSION
+                        ...state, // ค่าเริ่มต้น
+                        ...parsed, // ค่าเก่าที่โหลดมา
+                        v: VERSION // อัปเกรดเวอร์ชัน
                     };
                     
+                    // ป้องกันค่า balance เป็น null/undefined จากการแปลงไฟล์
+                    if (state.balance === null || state.balance === undefined) {
+                        state.balance = 0;
+                    }
+
                     cleanOldHistory();
-                    save();
-                } catch(e) { console.error("Load Error", e); }
+                    save(); 
+                } catch(e) { 
+                    console.error("Load Error:", e); 
+                }
             }
 
             const oldPin = localStorage.getItem('my_savings_app_pin') || localStorage.getItem('savings_app_lock_v1');
@@ -349,22 +394,42 @@
             const now = new Date();
             document.getElementById('date-display').innerText = new Intl.DateTimeFormat('th-TH', { weekday:'long', day:'numeric', month:'long' }).format(now);
             
+            renderCategories();
             checkLock();
             updateUI();
+        }
+
+        function renderCategories() {
+            const list = document.getElementById('category-list');
+            list.innerHTML = CATEGORIES.map(c => `
+                <div onclick="selectCat('${c.id}')" id="cat-${c.id}" class="category-pill flex-shrink-0 px-4 py-2 rounded-xl text-xs font-bold bg-white flex items-center space-x-2 ${c.id === selectedCat ? 'selected' : 'text-slate-400'}">
+                    <i class="fa-solid ${c.icon}"></i>
+                    <span>${c.label}</span>
+                </div>
+            `).join('');
+        }
+
+        function selectCat(id) {
+            selectedCat = id;
+            renderCategories();
+        }
+
+        function showToast(msg, isError = false) {
+            const toast = document.getElementById('toast');
+            const icon = document.getElementById('toast-icon');
+            document.getElementById('toast-msg').innerText = msg;
+            
+            icon.className = isError ? "fa-solid fa-circle-exclamation text-rose-400" : "fa-solid fa-check-circle text-emerald-400";
+            
+            toast.classList.add('show');
+            setTimeout(() => toast.classList.remove('show'), 2500);
         }
 
         function cleanOldHistory() {
             const ONE_WEEK = 7 * 24 * 60 * 60 * 1000;
             const now = Date.now();
-            const originalLength = state.history.length;
-            
-            state.history = state.history.filter(item => {
-                const itemTime = item.id; 
-                return (now - itemTime) < ONE_WEEK;
-            });
-            
-            if (originalLength !== state.history.length) {
-                console.log(`Auto-cleaned ${originalLength - state.history.length} old records.`);
+            if (state.history && state.history.length > 0) {
+                state.history = state.history.filter(item => (now - item.id) < ONE_WEEK);
             }
         }
 
@@ -395,7 +460,7 @@
             } else {
                 let w = parseInt(localStorage.getItem(WRONG_KEY) || "0") + 1;
                 localStorage.setItem(WRONG_KEY, w.toString());
-                if (w >= 2) {
+                if (w >= 3) {
                     const until = Date.now() + 60000;
                     localStorage.setItem(LOCK_UNTIL_KEY, until.toString());
                     checkLock();
@@ -449,14 +514,20 @@
             setTimeout(() => ui.style.opacity = "1", 50);
         }
 
-        function save() { localStorage.setItem(STORAGE_KEY, JSON.stringify(state)); }
+        function save() { 
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(state)); 
+        }
 
         function record(type) {
             const input = document.getElementById('main-input');
             let val = parseFloat(input.value);
-            if (!val || val <= 0) return;
+            if (!val || val <= 0) {
+                showToast("กรุณาระบุจำนวนเงิน", true);
+                return;
+            }
 
             if (type === 'spend') val = -val;
+            
             state.balance += val;
 
             const today = new Date().toISOString().split('T')[0];
@@ -468,16 +539,21 @@
                 }
             }
 
+            const cat = CATEGORIES.find(c => c.id === selectedCat);
+
             state.history.unshift({
                 id: Date.now(),
                 val: val,
+                cat: cat.label,
+                icon: cat.icon,
                 time: new Date().toLocaleTimeString('th-TH', { hour:'2-digit', minute:'2-digit' }),
                 date: new Date().toLocaleDateString('th-TH', { day:'numeric', month:'short' })
             });
 
             input.value = "";
-            save();
+            save(); 
             updateUI();
+            showToast(val > 0 ? "ออมเงินสำเร็จ!" : "บันทึกรายจ่ายแล้ว");
         }
 
         function updateUI() {
@@ -486,12 +562,12 @@
             document.getElementById('goal-input').value = state.goal;
             document.getElementById('goal-label').innerText = `${state.balance.toLocaleString()} / ${state.goal.toLocaleString()} ฿`;
 
-            const p = Math.min(100, Math.round((state.balance / state.goal) * 100));
+            const p = state.goal > 0 ? Math.min(100, Math.round((state.balance / state.goal) * 100)) : 0;
             document.getElementById('goal-percent-val').innerText = `${p}%`;
             document.getElementById('progress-bar').style.width = `${p}%`;
 
             const box = document.getElementById('history-box');
-            if (state.history.length === 0) {
+            if (!state.history || state.history.length === 0) {
                 box.innerHTML = `<div class="flex flex-col items-center justify-center py-12 opacity-40">
                     <i class="fa-solid fa-receipt text-4xl mb-3"></i>
                     <p class="text-sm italic">ไม่มีรายการในสัปดาห์นี้</p>
@@ -501,12 +577,12 @@
                     <div class="flex justify-between items-center p-4 bg-white rounded-2xl border border-slate-50 shadow-sm hover:shadow-md transition-shadow">
                         <div class="flex items-center space-x-4">
                             <div class="w-11 h-11 rounded-full flex items-center justify-center text-sm shadow-inner ${item.val > 0 ? 'bg-emerald-50 text-emerald-600' : 'bg-rose-50 text-rose-500'}">
-                                <i class="fa-solid ${item.val > 0 ? 'fa-arrow-down' : 'fa-arrow-up'}"></i>
+                                <i class="fa-solid ${item.icon || (item.val > 0 ? 'fa-arrow-down' : 'fa-arrow-up')}"></i>
                             </div>
                             <div>
                                 <p class="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-0.5">${item.date} • ${item.time}</p>
                                 <p class="font-bold text-slate-800 text-base leading-none">
-                                    ${item.val > 0 ? 'ออมเงิน' : 'ใช้จ่าย'}
+                                    ${item.cat || (item.val > 0 ? 'ออมเงิน' : 'ใช้จ่าย')}
                                 </p>
                             </div>
                         </div>
@@ -514,7 +590,6 @@
                             <p class="font-black text-lg ${item.val > 0 ? 'text-emerald-500' : 'text-rose-500'}">
                                 ${item.val > 0 ? '+' : ''}${item.val.toLocaleString()} ฿
                             </p>
-                            <p class="text-[8px] font-bold text-slate-300 uppercase tracking-widest">Confirmed</p>
                         </div>
                     </div>
                 `).join('');
@@ -533,7 +608,7 @@
             state.goal = parseFloat(document.getElementById('goal-input').value) || 5000;
             save();
             updateUI();
-            alert("บันทึกเป้าหมายสำเร็จ!");
+            showToast("อัปเดตเป้าหมายแล้ว");
         };
 
         window.wipe = () => {
